@@ -18,7 +18,7 @@ class AppRoutes {
 
 class AppStrings {
   AppStrings._();
-  static const String appName = 'SIPEKA';
+  static const String appName = 'SIGARDU';
   static const String appSubtitle =
       'Sistem Informasi Pelaporan\nKinerja dan Anggaran Kegiatan';
   static const String dashboard = 'Dashboard';

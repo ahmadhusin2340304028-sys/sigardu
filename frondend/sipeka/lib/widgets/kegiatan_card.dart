@@ -23,7 +23,8 @@ class KegiatanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final borderColor = Theme.of(context).dividerColor;
     final cardColor = Theme.of(context).cardColor;
-    final titleColor = Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary;
+    final titleColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary;
 
     return GestureDetector(
       onTap: onTap,
@@ -107,20 +108,23 @@ class KegiatanCard extends StatelessWidget {
                         const SizedBox(height: 10),
                         _ProgressMiniRow(
                           label: 'Fisik',
-                          value: kegiatan.progressFisik,
+                          value: kegiatan.totalRealisasiFisik,
+                          target: kegiatan.target,
                           color: _accentColor,
                         ),
                         const SizedBox(height: 5),
                         _ProgressMiniRow(
                           label: 'Anggaran',
-                          value: kegiatan.progressAnggaran,
+                          value: kegiatan.totalRealisasiAnggaran,
+                          target: kegiatan.paguAnggaran,
                           color: AppColors.primaryMid,
                         ),
                       ] else ...[
                         const SizedBox(height: 8),
                         _ProgressMiniRow(
                           label: 'Fisik',
-                          value: kegiatan.progressFisik,
+                          value: kegiatan.totalRealisasiFisik,
+                          target: kegiatan.target,
                           color: _accentColor,
                         ),
                       ],
@@ -168,13 +172,18 @@ class KegiatanCard extends StatelessWidget {
 class _ProgressMiniRow extends StatelessWidget {
   final String label;
   final double value;
+  final double target;
   final Color color;
 
   const _ProgressMiniRow({
     required this.label,
     required this.value,
+    required this.target,
     required this.color,
   });
+
+  double get _percentage =>
+      target > 0 ? (value / target * 100).clamp(0.0, 100.0).toDouble() : 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +195,8 @@ class _ProgressMiniRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 10,
-              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textMuted,
+              color: Theme.of(context).textTheme.bodySmall?.color ??
+                  AppColors.textMuted,
             ),
           ),
         ),
@@ -194,7 +204,7 @@ class _ProgressMiniRow extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(3),
             child: LinearProgressIndicator(
-              value: (value / 100).clamp(0.0, 1.0),
+              value: (_percentage / 100).clamp(0.0, 1.0).toDouble(),
               minHeight: 5,
               backgroundColor: Theme.of(context).dividerColor,
               valueColor: AlwaysStoppedAnimation<Color>(color),
@@ -203,9 +213,9 @@ class _ProgressMiniRow extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         SizedBox(
-          width: 38,
+          width: 52,
           child: Text(
-            '${value.toStringAsFixed(0)}%',
+            '${_percentage.toStringAsFixed(1)}%',
             textAlign: TextAlign.right,
             style: TextStyle(
               fontSize: 11,
@@ -242,10 +252,10 @@ class _BidangBadge extends StatelessWidget {
             bg: const Color(0xFFECFEFF), fg: const Color(0xFF155E75));
       case 'Pemberdayaan Masyarakat':
         return _BadgeStyle(
-            bg: const Color(0xFFECFEFF), fg: const Color.fromARGB(255, 103, 117, 21));
+            bg: const Color(0xFFECFEFF),
+            fg: const Color.fromARGB(255, 103, 117, 21));
       default:
-        return _BadgeStyle(
-            bg: AppColors.surfaceGray, fg: AppColors.textMuted);
+        return _BadgeStyle(bg: AppColors.surfaceGray, fg: AppColors.textMuted);
     }
   }
 
@@ -291,9 +301,7 @@ class _YearBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Badge(
-        label: year,
-        bg: AppColors.surfaceGray,
-        fg: AppColors.textMuted);
+        label: year, bg: AppColors.surfaceGray, fg: AppColors.textMuted);
   }
 }
 
@@ -312,8 +320,7 @@ class _Badge extends StatelessWidget {
           BoxDecoration(color: bg, borderRadius: BorderRadius.circular(5)),
       child: Text(
         label,
-        style: TextStyle(
-            fontSize: 10, fontWeight: FontWeight.w500, color: fg),
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: fg),
       ),
     );
   }

@@ -170,7 +170,7 @@ class CustomDrawer extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         title: const Text('Konfirmasi Keluar'),
         content: const Text(
-          'Apakah Anda yakin ingin keluar dari aplikasi SIPEKA?',
+          'Apakah Anda yakin ingin keluar dari aplikasi SIGARDU?',
         ),
         actions: [
           TextButton(

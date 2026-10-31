@@ -4,7 +4,7 @@ import 'package:sipeka/models/undangan_model.dart';
 
 class DioProvider {
   static String get baseApiUrl {
-    return 'http://192.168.1.6:8000/api';
+    return 'https://sipeka.whf.bz/api';
     // return 'http://10.0.2.2:8000/api';
   }
 
@@ -159,7 +159,7 @@ class DioProvider {
         final body = response.data['data'];
         if (body is Map && body['data'] != null) {
           final list = body['data'] as List<dynamic>? ?? [];
-          print('getKegiatan items: ${list.length}');
+          // print('getKegiatan items: ${list.length}');
           int toInt(dynamic value, int fallback) {
             if (value is int) return value;
             if (value is String) return int.tryParse(value) ?? fallback;

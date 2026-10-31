@@ -95,7 +95,7 @@ class TentangScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    "SIPEKA",
+                    "SIGARDU",
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -132,7 +132,7 @@ class TentangScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Text(
-                "SIPEKA (Sistem Informasi Pelaporan Kinerja dan Anggaran) "
+                "SIGARDU (Sistem Informasi Gerakan Agenda, Rekap Data dan Undangan) "
                 "merupakan aplikasi yang dirancang untuk membantu proses "
                 "monitoring, pencatatan, serta pelaporan kegiatan secara "
                 "efektif dan terintegrasi.",
@@ -340,7 +340,7 @@ class TentangScreen extends StatelessWidget {
             // ==================== FOOTER ====================
             Center(
               child: Text(
-                "© 2026 SIPEKA Team",
+                "© 2026 SIGARDU Team",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 13,

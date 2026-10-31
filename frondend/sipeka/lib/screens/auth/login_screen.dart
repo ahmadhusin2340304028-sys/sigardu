@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     if (!mounted) return;
-    if (ok) {      
+    if (ok) {
       Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
     } else {
       AppUtils.showError(
@@ -79,8 +79,7 @@ class _LoginScreenState extends State<LoginScreen>
                   emailCtrl: _emailCtrl,
                   passwordCtrl: _passwordCtrl,
                   obscure: _obscure,
-                  onToggleObscure: () =>
-                      setState(() => _obscure = !_obscure),
+                  onToggleObscure: () => setState(() => _obscure = !_obscure),
                   isLoading: isLoading,
                   onSubmit: _submit,
                 ),
@@ -91,10 +90,14 @@ class _LoginScreenState extends State<LoginScreen>
                   child: Column(
                     children: [
                       Text(
-                        "SIPEKA v1.0.0",
+                        "SIGARDU v1.0.0",
                         style: TextStyle(
                           fontSize: 12,
-                          color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.color
+                              ?.withOpacity(0.7),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -103,10 +106,10 @@ class _LoginScreenState extends State<LoginScreen>
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text("Tentang SIPEKA"),
+                              title: const Text("Tentang SIGARDU"),
                               content: const Text(
-                                "SIPEKA adalah Sistem Informasi Pelaporan "
-                                "Kinerja dan Anggaran Kegiatan.\n\n"
+                                "SIGARDU adalah Sistem Informasi Gerakan Agenda,"
+                                "Rekap Data dan Undangan. \n\n"
                                 "Dikembangkan untuk mendukung "
                                 "efisiensi pelaporan.",
                               ),
@@ -291,7 +294,8 @@ class _LoginCard extends StatelessWidget {
                 ),
               ),
               validator: (v) {
-                if (v == null || v.isEmpty) return 'Kata sandi tidak boleh kosong';
+                if (v == null || v.isEmpty)
+                  return 'Kata sandi tidak boleh kosong';
                 if (v.length < 6) return 'Minimal 6 karakter';
                 return null;
               },
@@ -351,7 +355,6 @@ class _HelpText extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),
-        
       ],
     );
   }

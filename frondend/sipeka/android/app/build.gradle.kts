@@ -32,8 +32,10 @@ android {
         applicationId = "com.sipeka.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = 5
-        versionName = "1.0.2"
+        // Version 8 is already affected by the Play policy finding.  Publish
+        // the corrected manifest as a new bundle version.
+        versionCode = 9
+        versionName = "1.2.1"
     }
 
     buildTypes {

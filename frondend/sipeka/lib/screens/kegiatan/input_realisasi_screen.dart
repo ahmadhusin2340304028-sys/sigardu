@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/app_utils.dart';
+import '../../models/kegiatan_model.dart';
 import '../../models/realisasi_model.dart';
 import '../../providers/dio_provider.dart';
 import '../../providers/kegiatan_provider.dart';
@@ -62,9 +63,8 @@ class _InputRealisasiScreenState extends State<InputRealisasiScreen> {
       _fisikCtrl.text = data.fisik != null
           ? data.fisik!.toStringAsFixed(data.fisik! % 1 == 0 ? 0 : 2)
           : '';
-      _anggaranCtrl.text = data.anggaran != null
-          ? data.anggaran!.toStringAsFixed(0)
-          : '';
+      _anggaranCtrl.text =
+          data.anggaran != null ? data.anggaran!.toStringAsFixed(0) : '';
       _catatanCtrl.text = data.keterangan ?? '';
     } else {
       // Belum ada data → form kosong
@@ -138,9 +138,8 @@ class _InputRealisasiScreenState extends State<InputRealisasiScreen> {
       bulan: rp.selectedBulan!,
       realisasiFisik: fisikVal,
       realisasiAnggaran: anggaranVal,
-      keterangan: _catatanCtrl.text.trim().isEmpty
-          ? null
-          : _catatanCtrl.text.trim(),
+      keterangan:
+          _catatanCtrl.text.trim().isEmpty ? null : _catatanCtrl.text.trim(),
     );
 
     if (!mounted) return;
@@ -189,9 +188,9 @@ class _InputRealisasiScreenState extends State<InputRealisasiScreen> {
                 if (kegiatan != null) _KegiatanBanner(kegiatan: kegiatan),
                 const SizedBox(height: 16),
 
-                // ── Ringkasan realisasi keseluruhan ───────────────────────
-                if (rp.realisasiKegiatan != null)
-                  _RealisasiSummaryCard(realisasi: rp.realisasiKegiatan!),
+                // ── Sisa realisasi keseluruhan ────────────────────────────
+                if (rp.realisasiKegiatan != null && kegiatan != null)
+                  _RealisasiSummaryCard(kegiatan: kegiatan),
                 const SizedBox(height: 16),
 
                 // ── Step 1: Pilih bulan ───────────────────────────────────
@@ -212,8 +211,7 @@ class _InputRealisasiScreenState extends State<InputRealisasiScreen> {
                 if (_formVisible && rp.selectedBulan != null) ...[
                   _StepLabel(
                     step: '2',
-                    label:
-                        'Isi Data Realisasi — '
+                    label: 'Isi Data Realisasi — '
                         '${AppMonths.list[(rp.selectedBulan ?? 1) - 1]}',
                     isActive: true,
                   ),
@@ -235,7 +233,8 @@ class _InputRealisasiScreenState extends State<InputRealisasiScreen> {
                       children: [
                         // ── Realisasi Fisik ──────────────────────────────
                         _FormSection(
-                          label: 'Realisasi Fisik (%)',
+                          label:
+                              'Realisasi Fisik (${kegiatan?.satuan ?? 'unit'})',
                           hint: 'Persentase fisik yang sudah tercapai',
                           child: TextFormField(
                             controller: _fisikCtrl,
@@ -348,9 +347,8 @@ class _InputRealisasiScreenState extends State<InputRealisasiScreen> {
                           width: double.infinity,
                           height: 52,
                           child: ElevatedButton.icon(
-                            onPressed: rp.isSubmitting || !canManage
-                                ? null
-                                : _submit,
+                            onPressed:
+                                rp.isSubmitting || !canManage ? null : _submit,
                             icon: rp.isSubmitting
                                 ? const SizedBox(
                                     width: 18,
@@ -365,10 +363,10 @@ class _InputRealisasiScreenState extends State<InputRealisasiScreen> {
                               rp.isSubmitting
                                   ? 'Menyimpan...'
                                   : (!canManage
-                                        ? 'Hanya Lihat Data'
-                                        : _selectedBuktiFile != null
-                                        ? 'Simpan & Unggah Bukti'
-                                        : (rp.selectedBulanData != null &&
+                                      ? 'Hanya Lihat Data'
+                                      : _selectedBuktiFile != null
+                                          ? 'Simpan & Unggah Bukti'
+                                          : (rp.selectedBulanData != null &&
                                                   rp.selectedBulanData!.hasData
                                               ? 'Perbarui Realisasi'
                                               : 'Simpan Realisasi')),
@@ -415,8 +413,12 @@ class _KegiatanBanner extends StatelessWidget {
           ),
           const SizedBox(height: 3),
           Text(
-            '${kegiatan.bidang} · ${kegiatan.tahun} · '
-            '${AppUtils.formatCurrencyCompact(kegiatan.anggaran)}',
+            '${kegiatan.bidang} · ${kegiatan.tahun}',
+            style: const TextStyle(fontSize: 11, color: AppColors.primaryMid),
+          ),
+          Text(
+            'pagu : ${AppUtils.formatCurrencyCompact(kegiatan.anggaran)} · '
+            'target : ${kegiatan.target} ${kegiatan.satuan}',
             style: const TextStyle(fontSize: 11, color: AppColors.primaryMid),
           ),
         ],
@@ -428,8 +430,8 @@ class _KegiatanBanner extends StatelessWidget {
 // ─── Ringkasan Realisasi Card ─────────────────────────────────────────────────
 
 class _RealisasiSummaryCard extends StatelessWidget {
-  final RealisasiKegiatan realisasi;
-  const _RealisasiSummaryCard({required this.realisasi});
+  final KegiatanModel kegiatan;
+  const _RealisasiSummaryCard({required this.kegiatan});
 
   @override
   Widget build(BuildContext context) {
@@ -448,7 +450,7 @@ class _RealisasiSummaryCard extends StatelessWidget {
               Icon(Icons.analytics_rounded, size: 16, color: AppColors.primary),
               SizedBox(width: 6),
               Text(
-                'Realisasi Kumulatif',
+                'Sisa Realisasi',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -462,27 +464,18 @@ class _RealisasiSummaryCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _SummaryItem(
-                  label: 'Fisik',
-                  value: '${realisasi.totalFisik.toStringAsFixed(1)}%',
-                  color: AppUtils.progressColor(realisasi.totalFisik),
-                ),
-              ),
-              Container(width: 0.5, height: 36, color: AppColors.border),
-              Expanded(
-                child: _SummaryItem(
-                  label: 'Anggaran',
-                  value: AppUtils.formatCurrencyCompact(
-                    realisasi.totalAnggaran,
-                  ),
+                  label: 'Sisa Anggaran',
+                  value: 'Rp. ${kegiatan.sisaAnggaran}',
                   color: AppColors.primaryMid,
                 ),
               ),
               Container(width: 0.5, height: 36, color: AppColors.border),
               Expanded(
                 child: _SummaryItem(
-                  label: 'Serapan',
-                  value: '${realisasi.persenAnggaran.toStringAsFixed(1)}%',
-                  color: AppUtils.progressColor(realisasi.persenAnggaran),
+                  label: 'Sisa Target',
+                  value:
+                      '${kegiatan.sisaTarget.toStringAsFixed(2)} ${kegiatan.satuan}',
+                  color: AppUtils.progressColor(kegiatan.sisaTarget),
                 ),
               ),
             ],
@@ -629,15 +622,15 @@ class _BulanGrid extends StatelessWidget {
               color: isSelected
                   ? AppColors.primary
                   : hasData
-                  ? AppColors.successLight
-                  : AppColors.surfaceGray,
+                      ? AppColors.successLight
+                      : AppColors.surfaceGray,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: isSelected
                     ? AppColors.primary
                     : hasData
-                    ? AppColors.success
-                    : AppColors.border,
+                        ? AppColors.success
+                        : AppColors.border,
                 width: isSelected ? 0 : 0.75,
               ),
             ),
@@ -652,8 +645,8 @@ class _BulanGrid extends StatelessWidget {
                     color: isSelected
                         ? Colors.white
                         : hasData
-                        ? AppColors.success
-                        : AppColors.textSecondary,
+                            ? AppColors.success
+                            : AppColors.textSecondary,
                   ),
                 ),
                 if (hasData) ...[
@@ -697,7 +690,7 @@ class _EditBadge extends StatelessWidget {
           Expanded(
             child: Text(
               'Data bulan $bulan sudah ada — form terisi otomatis. '
-              'Simpan untuk memperbarui.',
+              'Ubah data dan Simpan untuk mengedit.',
               style: const TextStyle(fontSize: 12, color: Color(0xFF92400E)),
             ),
           ),
@@ -822,16 +815,16 @@ class _BuktiPickerCard extends StatelessWidget {
               color: file != null
                   ? AppColors.primaryLight
                   : (hasExisting
-                        ? const Color(0xFFECFDF5)
-                        : AppColors.surfaceGray),
+                      ? const Color(0xFFECFDF5)
+                      : AppColors.surfaceGray),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               file != null
                   ? Icons.upload_file_rounded
                   : (hasExisting
-                        ? Icons.verified_rounded
-                        : Icons.note_add_rounded),
+                      ? Icons.verified_rounded
+                      : Icons.note_add_rounded),
               color: file != null
                   ? AppColors.primary
                   : (hasExisting ? AppColors.success : AppColors.textMuted),
@@ -860,8 +853,8 @@ class _BuktiPickerCard extends StatelessWidget {
                   file != null
                       ? '${_formatSize(file.size)} - akan diunggah saat disimpan'
                       : (hasExisting
-                            ? 'Kosongkan jika tidak ingin mengganti file.'
-                            : 'Lampirkan file pendukung realisasi.'),
+                          ? 'Kosongkan jika tidak ingin mengganti file.'
+                          : 'Lampirkan file pendukung realisasi.'),
                   style: const TextStyle(
                     fontSize: 11,
                     color: AppColors.textMuted,

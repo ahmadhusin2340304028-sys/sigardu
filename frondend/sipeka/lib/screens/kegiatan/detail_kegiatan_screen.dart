@@ -25,7 +25,6 @@ class _DetailKegiatanScreenState extends State<DetailKegiatanScreen> {
       if (kp.selected != null) {
         // ✅ Fetch detail lengkap termasuk realisasi_fisik per bulan
         kp.loadKegiatanDetail(kp.selected!.id);
-        
       }
     });
   }
@@ -42,7 +41,8 @@ class _DetailKegiatanScreenState extends State<DetailKegiatanScreen> {
   @override
   Widget build(BuildContext context) {
     final kegiatan = context.watch<KegiatanProvider>().selected;
-    print("kegiatan: $kegiatan. Detail: ${kegiatan != null ? kegiatan.realisasiBulanan : 'null'}");
+    print(
+        "kegiatan: $kegiatan. Detail: ${kegiatan != null ? kegiatan.realisasiBulanan : 'null'}");
     if (kegiatan == null) {
       return Scaffold(
         appBar: AppBar(title: const Text(AppStrings.detailKegiatan)),
@@ -73,9 +73,12 @@ class _DetailKegiatanScreenState extends State<DetailKegiatanScreen> {
                 _InfoRow('Program', kegiatan.program),
                 _InfoRow('Kegiatan', kegiatan.kegiatan),
                 _InfoRow('Sub Kegiatan', kegiatan.subKegiatan),
-                _InfoRow('Target Fisik', '${kegiatan.target.toStringAsFixed(2)} ${kegiatan.satuan}'),
-                _InfoRow('Realisasi Fisik', '${kegiatan.totalRealisasiFisik.toStringAsFixed(2)} ${kegiatan.satuan}'),
-                _InfoRow('Sisa Target', '${kegiatan.sisaTarget.toStringAsFixed(2)} ${kegiatan.satuan}'),
+                _InfoRow('Target Fisik',
+                    '${kegiatan.target.toStringAsFixed(2)} ${kegiatan.satuan}'),
+                _InfoRow('Realisasi Fisik',
+                    '${kegiatan.totalRealisasiFisik.toStringAsFixed(2)} ${kegiatan.satuan}'),
+                _InfoRow('Sisa Target',
+                    '${kegiatan.sisaTarget.toStringAsFixed(2)} ${kegiatan.satuan}'),
                 _InfoRow('Pagu Anggaran',
                     AppUtils.formatCurrency(kegiatan.paguAnggaran)),
                 _InfoRow('Realisasi Anggaran',
@@ -96,23 +99,16 @@ class _DetailKegiatanScreenState extends State<DetailKegiatanScreen> {
                   const SizedBox(height: 6),
                   AppProgressBar(
                     label: 'Realisasi Fisik',
-                    target: 100,
-                    value: kegiatan.progressFisik,
+                    target: kegiatan.target,
+                    value: kegiatan.totalRealisasiFisik,
                   ),
                   AppProgressBar(
                     label: 'Realisasi Anggaran',
-                    target: 100,
-                    value: kegiatan.progressAnggaran,
+                    target: kegiatan.paguAnggaran,
+                    value: kegiatan.totalRealisasiAnggaran,
                     color: AppColors.primaryMid,
                   ),
                   // Status pill
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      _StatusPill(status: AppUtils.progressLabel(
-                          kegiatan.progressFisik)),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -121,9 +117,8 @@ class _DetailKegiatanScreenState extends State<DetailKegiatanScreen> {
             // ── Monthly Chart ─────────────────────────────────────────────────
             if ((kegiatan.realisasiBulanan).isNotEmpty) ...[
               _Card(
-                title: 'Realisasi Fisik per Bulan (%)',
-                child: _MonthlyBarChart(
-                    data: kegiatan.realisasiBulanan),
+                title: 'Realisasi Fisik per Bulan (${kegiatan.satuan})',
+                child: _MonthlyBarChart(data: kegiatan.realisasiBulanan),
               ),
               const SizedBox(height: 12),
             ],
@@ -143,8 +138,8 @@ class _DetailKegiatanScreenState extends State<DetailKegiatanScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(
-                    context, AppRoutes.inputRealisasi),
+                onPressed: () =>
+                    Navigator.pushNamed(context, AppRoutes.inputRealisasi),
                 icon: const Icon(Icons.add_rounded, size: 20),
                 label: const Text('Input Realisasi',
                     style: TextStyle(fontSize: 15)),
@@ -219,8 +214,8 @@ class _Chip extends StatelessWidget {
       decoration:
           BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
       child: Text(label,
-          style: TextStyle(
-              fontSize: 11, fontWeight: FontWeight.w500, color: fg)),
+          style:
+              TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: fg)),
     );
   }
 }
@@ -299,8 +294,7 @@ class _InfoCard extends StatelessWidget {
           ...rows.asMap().entries.map((e) {
             final isLast = e.key == rows.length - 1;
             return Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
               decoration: BoxDecoration(
                 border: isLast
                     ? null
@@ -315,7 +309,8 @@ class _InfoCard extends StatelessWidget {
                     width: 140,
                     child: Text(e.value.key,
                         style: TextStyle(
-                            fontSize: 12, color: AppTheme.textMutedOf(context))),
+                            fontSize: 12,
+                            color: AppTheme.textMutedOf(context))),
                   ),
                   Expanded(
                     child: Text(
@@ -353,8 +348,20 @@ class _MonthlyBarChartState extends State<_MonthlyBarChart>
   late AnimationController _ctrl;
   late Animation<double> _anim;
 
-  final _months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-                   'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+  final _months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mei',
+    'Jun',
+    'Jul',
+    'Ags',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Des'
+  ];
 
   @override
   void initState() {
@@ -384,9 +391,8 @@ class _MonthlyBarChartState extends State<_MonthlyBarChart>
           crossAxisAlignment: CrossAxisAlignment.end,
           children: widget.data.map<Widget>((d) {
             final frac = (d.fisik / maxVal) * _anim.value;
-            final monthLabel = d.bulan >= 1 && d.bulan <= 12
-                ? _months[d.bulan - 1]
-                : '?';
+            final monthLabel =
+                d.bulan >= 1 && d.bulan <= 12 ? _months[d.bulan - 1] : '?';
             return Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2.5),
@@ -394,7 +400,7 @@ class _MonthlyBarChartState extends State<_MonthlyBarChart>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      '${d.fisik.toStringAsFixed(0)}%',
+                      '${d.fisik.toStringAsFixed(0)}',
                       style: TextStyle(
                           fontSize: 7.5,
                           color: AppTheme.textMutedOf(context),
@@ -402,8 +408,8 @@ class _MonthlyBarChartState extends State<_MonthlyBarChart>
                     ),
                     const SizedBox(height: 2),
                     ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(3)),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(3)),
                       child: Container(
                         height: 55 * frac.clamp(0.05, 1.0) as double,
                         color: AppColors.primary,
@@ -432,9 +438,7 @@ class _TriwulanSheet extends StatelessWidget {
   final KegiatanModel kegiatan;
   const _TriwulanSheet({required this.kegiatan});
 
-  // Hitung akumulasi per triwulan dari realisasiBulanan
-  // Fisik: nilai bulan terakhir yang ada di triwulan (kumulatif terakhir)
-  // Anggaran: sum semua bulan di triwulan
+  // Hitung realisasi pada masing-masing triwulan.
   List<_TriwulanData> _buildTriwulan() {
     final bulanan = kegiatan.realisasiBulanan;
 
@@ -447,16 +451,14 @@ class _TriwulanSheet extends StatelessWidget {
           .toList()
         ..sort((a, b) => a.bulan.compareTo(b.bulan));
 
-      // Fisik: ambil nilai bulan terakhir yang ada data (kumulatif)
-      final fisikBulanAda = bulanDiTriwulan.where((b) => b.fisik > 0).toList();
-      final fisikAkumulatif = fisikBulanAda.isNotEmpty
-          ? fisikBulanAda.last.fisik
-          : 0.0;
-
-      // Anggaran: sum semua bulan di triwulan ini
-      final anggaranSum =
-          bulanDiTriwulan.fold<double>(0, (sum, b) => sum + b.anggaran);
-
+      final fisikTriwulan = bulanDiTriwulan.fold<double>(
+        0,
+        (sum, b) => sum + b.fisik,
+      );
+      final anggaranTriwulan = bulanDiTriwulan.fold<double>(
+        0,
+        (sum, b) => sum + b.anggaran,
+      );
       // Data per bulan untuk tampilan detail
       final perBulan = List.generate(3, (j) {
         final bulanIdx = startBulan + j;
@@ -470,8 +472,8 @@ class _TriwulanSheet extends StatelessWidget {
 
       return _TriwulanData(
         nomor: i + 1,
-        fisikAkumulatif: fisikAkumulatif,
-        anggaranSum: anggaranSum,
+        fisikTriwulan: fisikTriwulan,
+        anggaranTriwulan: anggaranTriwulan,
         perBulan: perBulan,
       );
     });
@@ -494,7 +496,8 @@ class _TriwulanSheet extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: AppTheme.surfaceOf(context),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Column(
               children: [
@@ -536,8 +539,7 @@ class _TriwulanSheet extends StatelessWidget {
                 ),
                 // Sub info kegiatan
                 Padding(
-                  padding:
-                      const EdgeInsets.fromLTRB(20, 0, 20, 14),
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
                   child: Text(
                     '${kegiatan.bidang}  ·  Target: ${kegiatan.target.toStringAsFixed(0)} ${kegiatan.satuan}  ·  Pagu: ${AppUtils.formatCurrencyCompact(kegiatan.paguAnggaran)}',
                     style: TextStyle(
@@ -549,14 +551,29 @@ class _TriwulanSheet extends StatelessWidget {
             ),
           ),
 
-          // ── List Triwulan ─────────────────────────────────────────────────
+          // ── Ringkasan kumulatif + daftar triwulan ──────────────────────────
           Expanded(
-            child: ListView.separated(
+            child: ListView(
               padding: const EdgeInsets.all(16),
-              itemCount: triwulanList.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (ctx, i) =>
-                  _TriwulanCard(data: triwulanList[i], kegiatan: kegiatan),
+              children: [
+                _AkumulasiRealisasiCard(kegiatan: kegiatan),
+                const SizedBox(height: 20),
+                Text(
+                  'Realisasi per Triwulan',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimaryOf(context),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ...triwulanList.map(
+                  (data) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _TriwulanCard(data: data, kegiatan: kegiatan),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -576,14 +593,14 @@ class _BulanItem {
 
 class _TriwulanData {
   final int nomor;
-  final double fisikAkumulatif;
-  final double anggaranSum;
+  final double fisikTriwulan;
+  final double anggaranTriwulan;
   final List<_BulanItem> perBulan;
 
   _TriwulanData({
     required this.nomor,
-    required this.fisikAkumulatif,
-    required this.anggaranSum,
+    required this.fisikTriwulan,
+    required this.anggaranTriwulan,
     required this.perBulan,
   });
 }
@@ -603,44 +620,41 @@ class _TriwulanCardState extends State<_TriwulanCard> {
   bool _expanded = false;
 
   static const _namaBulan = [
-    '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+    '',
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
   ];
-
-  bool get _hasData =>
-      widget.data.fisikAkumulatif > 0 || widget.data.anggaranSum > 0;
-
-  Color get _statusColor {
-    if (!_hasData) return AppColors.textHint;
-    if (widget.data.fisikAkumulatif >= (widget.kegiatan.target*0.25)) return AppColors.success;
-    if (widget.data.fisikAkumulatif >= (widget.kegiatan.target*0.125)) return AppColors.primary;
-    return AppColors.warning;
-  }
-
-  String get _statusLabel {
-    if (!_hasData) return 'Belum Ada Data';
-    if (widget.data.fisikAkumulatif >= (widget.kegiatan.target*0.25)) return 'On Track';
-    if (widget.data.fisikAkumulatif >= (widget.kegiatan.target*0.125)) return 'Perlu Perhatian';
-    return 'At Risk';
-  }
 
   @override
   Widget build(BuildContext context) {
     final d = widget.data;
     final paguAnggaran = widget.kegiatan.paguAnggaran;
     final persenAnggaran = paguAnggaran > 0
-        ? (d.anggaranSum / paguAnggaran * 100).clamp(0.0, 100.0)
+        ? (d.anggaranTriwulan / paguAnggaran * 100).clamp(0.0, 100.0).toDouble()
         : 0.0;
-    final persenFisik =
-        d.fisikAkumulatif.clamp(0.0, 100.0);
+    final persenFisik = widget.kegiatan.target > 0
+        ? (d.fisikTriwulan / widget.kegiatan.target * 100)
+            .clamp(0.0, 100.0)
+            .toDouble()
+        : 0.0;
 
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.surfaceOf(context),
         borderRadius: BorderRadius.circular(13),
         border: Border.all(
-          color: _hasData ? _statusColor.withOpacity(0.3) : AppTheme.borderOf(context),
-          width: _hasData ? 1 : 0.5,
+          color: AppTheme.borderOf(context),
+          width: 0.5,
         ),
       ),
       child: Column(
@@ -661,9 +675,7 @@ class _TriwulanCardState extends State<_TriwulanCard> {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: _hasData
-                              ? _statusColor.withOpacity(0.12)
-                              : AppTheme.surfaceGrayOf(context),
+                          color: AppColors.primaryLight,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -672,7 +684,7 @@ class _TriwulanCardState extends State<_TriwulanCard> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: _hasData ? _statusColor : AppTheme.textMutedOf(context),
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
@@ -693,31 +705,12 @@ class _TriwulanCardState extends State<_TriwulanCard> {
                             Text(
                               _bulanRange(d.nomor),
                               style: TextStyle(
-                                  fontSize: 11, color: AppTheme.textMutedOf(context)),
+                                  fontSize: 11,
+                                  color: AppTheme.textMutedOf(context)),
                             ),
                           ],
                         ),
                       ),
-                      // Status badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: _hasData
-                              ? _statusColor.withOpacity(0.1)
-                              : AppTheme.surfaceGrayOf(context),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          _statusLabel,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: _hasData ? _statusColor : AppTheme.textMutedOf(context),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
                       Icon(
                         _expanded
                             ? Icons.keyboard_arrow_up_rounded
@@ -729,19 +722,21 @@ class _TriwulanCardState extends State<_TriwulanCard> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Progress bars ringkasan
+                  // Realisasi pada triwulan ini saja.
                   _MiniProgressRow(
                     label: 'Fisik',
                     value: persenFisik,
-                    color: _statusColor,
-                    suffix: '${persenFisik.toStringAsFixed(1)}%',
+                    color: AppColors.primary,
+                    amount: d.fisikTriwulan.toStringAsFixed(1),
+                    percentage: '${persenFisik.toStringAsFixed(1)}%',
                   ),
                   const SizedBox(height: 5),
                   _MiniProgressRow(
                     label: 'Anggaran',
                     value: persenAnggaran,
                     color: AppColors.primaryMid,
-                    suffix: AppUtils.formatCurrencyCompact(d.anggaranSum),
+                    amount: AppUtils.formatCurrencyCompact(d.anggaranTriwulan),
+                    percentage: '${persenAnggaran.toStringAsFixed(1)}%',
                   ),
                 ],
               ),
@@ -795,7 +790,7 @@ class _TriwulanCardState extends State<_TriwulanCard> {
                           child: _BulanStat(
                             label: 'Fisik',
                             value: b.fisik != null
-                                ? '${b.fisik!.toStringAsFixed(1)}%'
+                                ? '${b.fisik!.toStringAsFixed(1)} ${widget.kegiatan.satuan}'
                                 : '-',
                             hasData: b.fisik != null && b.fisik! > 0,
                           ),
@@ -829,19 +824,86 @@ class _TriwulanCardState extends State<_TriwulanCard> {
   }
 }
 
+// ─── Akumulasi Realisasi ─────────────────────────────────────────────────────
+
+class _AkumulasiRealisasiCard extends StatelessWidget {
+  final KegiatanModel kegiatan;
+  const _AkumulasiRealisasiCard({required this.kegiatan});
+
+  @override
+  Widget build(BuildContext context) {
+    final totalFisik = kegiatan.totalRealisasiFisik;
+    final totalAnggaran = kegiatan.totalRealisasiAnggaran;
+    final persenFisik = kegiatan.target > 0
+        ? (totalFisik / kegiatan.target * 100).clamp(0.0, 100.0).toDouble()
+        : 0.0;
+    final persenAnggaran = kegiatan.paguAnggaran > 0
+        ? (totalAnggaran / kegiatan.paguAnggaran * 100)
+            .clamp(0.0, 100.0)
+            .toDouble()
+        : 0.0;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceOf(context),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: AppTheme.borderOf(context), width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Akumulasi Realisasi',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimaryOf(context),
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            'Total seluruh realisasi yang telah dicatat.',
+            style:
+                TextStyle(fontSize: 10, color: AppTheme.textMutedOf(context)),
+          ),
+          const SizedBox(height: 12),
+          _MiniProgressRow(
+            label: 'Fisik',
+            value: persenFisik,
+            color: AppColors.primary,
+            amount: totalFisik.toStringAsFixed(1),
+            percentage: '${persenFisik.toStringAsFixed(1)}%',
+          ),
+          const SizedBox(height: 8),
+          _MiniProgressRow(
+            label: 'Anggaran',
+            value: persenAnggaran,
+            color: AppColors.primaryMid,
+            amount: AppUtils.formatCurrencyCompact(totalAnggaran),
+            percentage: '${persenAnggaran.toStringAsFixed(1)}%',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Mini Progress Row ────────────────────────────────────────────────────────
 
 class _MiniProgressRow extends StatelessWidget {
   final String label;
   final double value; // 0–100
   final Color color;
-  final String suffix;
+  final String amount;
+  final String percentage;
 
   const _MiniProgressRow({
     required this.label,
     required this.value,
     required this.color,
-    required this.suffix,
+    required this.amount,
+    required this.percentage,
   });
 
   @override
@@ -858,7 +920,7 @@ class _MiniProgressRow extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(3),
             child: LinearProgressIndicator(
-              value: (value / 100).clamp(0.0, 1.0),
+              value: (value / 100).clamp(0.0, 1.0).toDouble(),
               minHeight: 5,
               backgroundColor: AppTheme.borderOf(context),
               valueColor: AlwaysStoppedAnimation<Color>(color),
@@ -867,10 +929,12 @@ class _MiniProgressRow extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         SizedBox(
-          width: 68,
+          width: 122,
           child: Text(
-            suffix,
+            '$amount | $percentage',
             textAlign: TextAlign.right,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
@@ -914,7 +978,9 @@ class _BulanStat extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: hasData ? AppTheme.textPrimaryOf(context) : AppTheme.textMutedOf(context),
+            color: hasData
+                ? AppTheme.textPrimaryOf(context)
+                : AppTheme.textMutedOf(context),
           ),
         ),
       ],

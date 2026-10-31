@@ -8,8 +8,8 @@ import '../core/utils/app_utils.dart';
 
 class AppProgressBar extends StatefulWidget {
   final String label;
-  final double value; 
-  final double target;  // langsung 0–100 (persen), BUKAN raw value
+  final double value;
+  final double target;
   final Color? color;
   final bool animated;
   final bool showPercent;
@@ -18,7 +18,7 @@ class AppProgressBar extends StatefulWidget {
   const AppProgressBar({
     super.key,
     required this.label,
-    required this.value, // ← HAPUS parameter 'target'
+    required this.value,
     required this.target,
     this.color,
     this.animated = true,
@@ -35,6 +35,12 @@ class _AppProgressBarState extends State<AppProgressBar>
   late AnimationController _ctrl;
   late Animation<double> _anim;
 
+  double get _ratio => widget.target > 0
+      ? (widget.value / widget.target).clamp(0.0, 1.0).toDouble()
+      : 0.0;
+
+  double get _percentage => _ratio * 100;
+
   @override
   void initState() {
     super.initState();
@@ -42,10 +48,9 @@ class _AppProgressBarState extends State<AppProgressBar>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     );
-    // ✅ value sudah dalam persen (0–100), bagi 100 untuk LinearProgressIndicator
     _anim = Tween<double>(
       begin: 0,
-      end: (widget.value / widget.target).clamp(0.0, 1.0), // ← simpan sebagai 0.0–1.0
+      end: _ratio,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
 
     if (widget.animated) _ctrl.forward();
@@ -54,10 +59,10 @@ class _AppProgressBarState extends State<AppProgressBar>
   @override
   void didUpdateWidget(AppProgressBar old) {
     super.didUpdateWidget(old);
-    if (old.value != widget.value) {
+    if (old.value != widget.value || old.target != widget.target) {
       _anim = Tween<double>(
         begin: _anim.value,
-        end: (widget.value / widget.target).clamp(0.0, 1.0),
+        end: _ratio,
       ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
       _ctrl
         ..reset()
@@ -71,7 +76,7 @@ class _AppProgressBarState extends State<AppProgressBar>
     super.dispose();
   }
 
-  Color get _barColor => widget.color ?? AppUtils.progressColor(widget.value);
+  Color get _barColor => widget.color ?? AppUtils.progressColor(_percentage);
 
   @override
   Widget build(BuildContext context) {
@@ -93,13 +98,18 @@ class _AppProgressBarState extends State<AppProgressBar>
               if (widget.showPercent)
                 AnimatedBuilder(
                   animation: _anim,
-                  builder: (_, __) => Text(
-                    // ✅ _anim sudah 0.0–1.0, kali 100 untuk tampilan
-                    '${(_anim.value * 100).toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: _barColor,
+                  builder: (_, __) => SizedBox(
+                    width: 52,
+                    child: Text(
+                      '${(_anim.value * 100).toStringAsFixed(1)}%',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: _barColor,
+                      ),
                     ),
                   ),
                 ),
@@ -111,7 +121,7 @@ class _AppProgressBarState extends State<AppProgressBar>
             child: AnimatedBuilder(
               animation: _anim,
               builder: (_, __) => LinearProgressIndicator(
-                value: _anim.value, // ✅ sudah 0.0–1.0
+                value: _anim.value,
                 minHeight: widget.height,
                 backgroundColor: AppColors.border,
                 valueColor: AlwaysStoppedAnimation<Color>(_barColor),

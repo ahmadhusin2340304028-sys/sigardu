@@ -685,7 +685,7 @@ class _GreetingBanner extends StatelessWidget {
                       color: AppColors.primaryDark,
                     ),
                   ),
-                  const TextSpan(text: ' — Selamat datang di SIPEKA'),
+                  const TextSpan(text: ' — Selamat datang di SIGARDU'),
                 ],
               ),
             ),
