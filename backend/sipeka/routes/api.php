@@ -8,6 +8,7 @@ use App\Http\Controllers\API\RealisasiController;
 use App\Http\Controllers\API\UndanganController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ExportController;
+use App\Http\Controllers\API\AdminDataController;
 
 
 /*
@@ -134,5 +135,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('export')->group(function () {
         Route::get('/excel', [ExportController::class, 'excel']);
         Route::get('/pdf',   [ExportController::class, 'pdf']);
+    });
+
+    // ── Kelola keseluruhan data (Admin only) ───────────────────────────────
+    Route::prefix('admin/data')->middleware('role:Admin')->group(function () {
+        Route::get('/backup', [AdminDataController::class, 'backup']);
+        Route::get('/kegiatan-cleanup-preview', [AdminDataController::class, 'previewKegiatanCleanup']);
+        Route::delete('/kegiatan-by-year', [AdminDataController::class, 'deleteKegiatanByYear']);
+        Route::get('/undangan-cleanup-preview', [AdminDataController::class, 'previewUndanganCleanup']);
+        Route::delete('/old-undangan', [AdminDataController::class, 'deleteOldUndangan']);
+        Route::post('/kegiatan-import', [AdminDataController::class, 'importKegiatan']);
     });
 });

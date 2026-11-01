@@ -247,6 +247,17 @@ class KegiatanProvider extends ChangeNotifier {
     }
   }
 
+  /// Mengembalikan daftar kegiatan ke kondisi awal saat halaman dibuka kembali.
+  ///
+  /// Provider hidup lebih lama daripada [KegiatanScreen], sehingga query lama
+  /// tidak boleh terbawa ketika kolom pencarian pada screen baru masih kosong.
+  Future<void> resetFiltersAndLoad() async {
+    _searchDebounce?.cancel();
+    _searchQuery = '';
+    _selectedBidang = null;
+    await loadKegiatan();
+  }
+
   // ── Submit Realisasi ──────────────────────────────────────────────────────
 
   Future<bool> submitRealisasi({

@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen>
                   child: Column(
                     children: [
                       Text(
-                        "SIGARDU v1.0.0",
+                        "SIGARDU v1.2.2",
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context)
@@ -244,20 +244,20 @@ class _LoginCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             const Text(
-              'Gunakan NIP/email dan kata sandi Anda',
+              'Gunakan username/posisi dan kata sandi Anda',
               style: TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),
             const SizedBox(height: 22),
 
             // Email
-            const _FieldLabel('Username / NIP / Email'),
+            const _FieldLabel('Username/Posisi Jabatan'),
             const SizedBox(height: 6),
             TextFormField(
               controller: emailCtrl,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
-                hintText: 'Masukkan username atau email',
+                hintText: 'Masukkan username atau posisi jabatan',
                 prefixIcon: Icon(Icons.person_outline_rounded,
                     size: 20, color: AppColors.textMuted),
               ),

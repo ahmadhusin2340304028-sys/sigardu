@@ -14,13 +14,14 @@ class AppRoutes {
   static const String adminKegiatan = '/admin/kegiatan';
   static const String adminUndangan = '/admin/undangan';
   static const String adminBidang = '/admin/bidang';
+  static const String adminData = '/admin/data';
 }
 
 class AppStrings {
   AppStrings._();
   static const String appName = 'SIGARDU';
   static const String appSubtitle =
-      'Sistem Informasi Pelaporan\nKinerja dan Anggaran Kegiatan';
+      'Sistem Informasi Gerakan Agenda,\nRekap Data dan Undangan';
   static const String dashboard = 'Dashboard';
   static const String kegiatan = 'Kegiatan';
   static const String undangan = 'Undangan';

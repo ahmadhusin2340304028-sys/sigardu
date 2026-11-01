@@ -481,7 +481,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 18),
 
                   // ── Summary Cards ──────────────────────────────────────────
-                  const _SectionTitle('Ringkasan Kinerja'),
+                  _SectionTitle('Ringkasan Kinerja ${DateTime.now().year}'),
                   const SizedBox(height: 10),
                   if (summary != null) ...[
                     // Row 1

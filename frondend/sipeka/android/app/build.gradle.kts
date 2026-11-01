@@ -34,8 +34,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         // Version 8 is already affected by the Play policy finding.  Publish
         // the corrected manifest as a new bundle version.
-        versionCode = 9
-        versionName = "1.2.1"
+        versionCode = 10
+        versionName = "1.2.2"
     }
 
     buildTypes {

@@ -25,8 +25,9 @@ class _KegiatanScreenState extends State<KegiatanScreen> {
     super.initState();
     _scrollCtrl.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // ✅ Hapus guard !kp.isLoaded — selalu load ulang saat screen dibuka
-      context.read<KegiatanProvider>().loadKegiatan();
+      // Provider tetap hidup saat berpindah menu, sedangkan search field dibuat
+      // ulang. Reset filter agar daftar dan field pencarian selalu konsisten.
+      context.read<KegiatanProvider>().resetFiltersAndLoad();
     });
   }
 
@@ -55,7 +56,7 @@ class _KegiatanScreenState extends State<KegiatanScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.kegiatan)),
       drawer: const CustomDrawer(),
-      floatingActionButton: _ExportFab(), 
+      floatingActionButton: _ExportFab(),
       body: Column(
         children: [
           // ── Search + Filters ─────────────────────────────────────────────
@@ -77,77 +78,80 @@ class _KegiatanScreenState extends State<KegiatanScreen> {
             child: kp.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : kp.loadState == LoadState.error
-                // ✅ Tampilkan error state agar user tahu masalahnya
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.wifi_off_rounded,
-                          size: 48,
-                          color: AppColors.textHint,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          kp.errorMessage ?? 'Gagal memuat data',
-                          style: const TextStyle(color: AppColors.textMuted),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: kp.loadKegiatan,
-                          icon: const Icon(Icons.refresh_rounded),
-                          label: const Text('Coba Lagi'),
-                        ),
-                      ],
-                    ),
-                  )
-                : list.isEmpty
-                ? _EmptyState(
-                    hasFilter:
-                        kp.searchQuery.isNotEmpty || kp.selectedBidang != null,
-                    onClear: () {
-                      _searchCtrl.clear();
-                      kp.clearFilters();
-                    },
-                  )
-                : RefreshIndicator(
-                    onRefresh: kp.refreshKegiatan,
-                    child: ListView.separated(
-                      controller: _scrollCtrl,
-                      padding: const EdgeInsets.all(16),
-                      itemCount: list.length + (kp.isLoadingMore ? 1 : 0),
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (ctx, i) {
-                        if (i >= list.length) {
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            child: Center(
-                              child: SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
+                    // ✅ Tampilkan error state agar user tahu masalahnya
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.wifi_off_rounded,
+                              size: 48,
+                              color: AppColors.textHint,
                             ),
-                          );
-                        }
+                            const SizedBox(height: 12),
+                            Text(
+                              kp.errorMessage ?? 'Gagal memuat data',
+                              style:
+                                  const TextStyle(color: AppColors.textMuted),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: kp.loadKegiatan,
+                              icon: const Icon(Icons.refresh_rounded),
+                              label: const Text('Coba Lagi'),
+                            ),
+                          ],
+                        ),
+                      )
+                    : list.isEmpty
+                        ? _EmptyState(
+                            hasFilter: kp.searchQuery.isNotEmpty ||
+                                kp.selectedBidang != null,
+                            onClear: () {
+                              _searchCtrl.clear();
+                              kp.clearFilters();
+                            },
+                          )
+                        : RefreshIndicator(
+                            onRefresh: kp.refreshKegiatan,
+                            child: ListView.separated(
+                              controller: _scrollCtrl,
+                              padding: const EdgeInsets.all(16),
+                              itemCount:
+                                  list.length + (kp.isLoadingMore ? 1 : 0),
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 10),
+                              itemBuilder: (ctx, i) {
+                                if (i >= list.length) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
 
-                        final k = list[i];
-                        return KegiatanCard(
-                          kegiatan: k,
-                          onTap: () {
-                            kp.selectKegiatan(k);
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.detailKegiatan,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                                final k = list[i];
+                                return KegiatanCard(
+                                  kegiatan: k,
+                                  onTap: () {
+                                    kp.selectKegiatan(k);
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.detailKegiatan,
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
           ),
           const SizedBox(height: 40),
         ],
@@ -315,7 +319,7 @@ class _EmptyState extends StatelessWidget {
 
 class _ExportFab extends StatelessWidget {
   const _ExportFab();
- 
+
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(

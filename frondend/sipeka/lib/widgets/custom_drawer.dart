@@ -133,6 +133,13 @@ class CustomDrawer extends StatelessWidget {
                       currentRoute: route,
                       accentColor: AppColors.warning,
                     ),
+                    _DrawerItem(
+                      icon: Icons.storage_rounded,
+                      label: 'Kelola Data',
+                      route: AppRoutes.adminData,
+                      currentRoute: route,
+                      accentColor: AppColors.warning,
+                    ),
                   ],
                 ],
               ),

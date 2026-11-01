@@ -14,6 +14,7 @@ import 'providers/realisasi_provider.dart';
 import 'providers/admin_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/bidang_provider.dart';
+import 'providers/data_management_provider.dart';
 
 import 'screens/auth/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
@@ -28,6 +29,7 @@ import 'screens/tentang/tentang_screen.dart';
 import 'screens/admin/admin_kegiatan_screen.dart';
 import 'screens/admin/admin_undangan_screen.dart';
 import 'screens/admin/admin_bidang_screen.dart';
+import 'screens/admin/data_management_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,6 +69,7 @@ class SipekaApp extends StatelessWidget {
 
         // ✅ Bidang Provider — master data bidang untuk seluruh fitur
         ChangeNotifierProvider(create: (_) => BidangProvider()),
+        ChangeNotifierProvider(create: (_) => DataManagementProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
@@ -117,6 +120,9 @@ class SipekaApp extends StatelessWidget {
 
                 AppRoutes.adminBidang: (_) =>
                     const _AdminGuard(child: AdminBidangScreen()),
+
+                AppRoutes.adminData: (_) =>
+                    const _AdminGuard(child: DataManagementScreen()),
               },
             ),
           );
