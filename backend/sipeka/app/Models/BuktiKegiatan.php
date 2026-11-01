@@ -28,10 +28,11 @@ class BuktiKegiatan extends Model
     }
 
     /**
-     * Full URL untuk mengakses file.
+     * URL file lewat route /files/{path} (web.php), bukan /storage/...
+     * sehingga tidak butuh symlink storage:link.
      */
     public function getFileUrlAttribute(): string
     {
-        return asset('storage/' . $this->file_path);
+        return url('files/' . ltrim($this->file_path, '/'));
     }
 }

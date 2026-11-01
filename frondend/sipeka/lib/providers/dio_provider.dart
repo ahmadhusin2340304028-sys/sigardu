@@ -103,7 +103,7 @@ class DioProvider {
       );
 
       // print('Dashboard status: ${response.statusCode}');
-      print('Dashboard body: ${response.data}');
+      // print('Dashboard body: ${response.data}');
 
       if (response.statusCode == 200 && response.data != null) {
         final body = response.data;
@@ -114,7 +114,7 @@ class DioProvider {
       return null;
     } catch (e, st) {
       // ✅ Jangan catch kosong — print errornya
-      print('❌ getDashboardSummary error: $e');
+      // print('❌ getDashboardSummary error: $e');
       print('Stack: $st');
       return null;
     }

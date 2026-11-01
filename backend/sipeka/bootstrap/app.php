@@ -22,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Pastikan Sanctum statefulDomain dikonfigurasi jika butuh web+api
-        $middleware->statefulApi();
+        // $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // JSON response untuk semua exception di API

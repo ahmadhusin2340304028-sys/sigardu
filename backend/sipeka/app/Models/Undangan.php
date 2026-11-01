@@ -47,10 +47,10 @@ class Undangan extends Model
     }
 
     /**
-     * URL bukti file.
+     * URL bukti lewat route /files/{path} (web.php), bukan /storage/...
      */
     public function getBuktiUrlAttribute(): ?string
     {
-        return $this->bukti ? asset('storage/' . $this->bukti) : null;
+        return $this->bukti ? url('files/' . ltrim($this->bukti, '/')) : null;
     }
 }
